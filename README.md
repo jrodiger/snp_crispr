@@ -3,6 +3,7 @@ SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, 
 
 ## Prerequisites
 - Anaconda or Miniconda for environment management
+
 **Note:** To install without conda, see `environment.yml` for dependencies
 - Species genome in fasta format
 
@@ -12,6 +13,7 @@ SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, 
 - Put species genome fasta file in `fasta_files/<species>.fasta`
 - Run `makeblastdb -in fasta_files/<species>.fasta -dbtype nucl -parse_seqids -title <species> -out blast_dbs/<species>`
 - Species chromosome names -> fasta id mapping files included in `fasta_files/<species>_chr_ids.txt`
+
 **Important Note:** `<species>` name/abbreviation in `fasta_files/<species>.fasta`, `fasta_files/<species>_chr_ids.txt`, and `blast_dbs/<species>` must all match
 
 ## Usage
@@ -28,6 +30,7 @@ SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, 
 
 ## Authors
 **Jonathan Rodiger** - [jrodiger](https://github.com/jrodiger)
+
 **Verena Chung** - [vpchung](https://github.com/vpchung)
 
 ## License

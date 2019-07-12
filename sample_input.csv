@@ -1,0 +1,5 @@
+gene_symbol,chromosome,position,strand,reference,variant,group(optional)
+MT-ND1,MT,3540,+,T,C,
+NA,2L,19957942,+,G,A,1
+NA,2L,306360,+,G,C,2
+NA,2L,19957942,+,G,C,1

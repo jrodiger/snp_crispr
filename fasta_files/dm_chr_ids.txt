@@ -1,0 +1,8 @@
+Chr	X	X
+Chr	2L	2L
+Chr	2R	2R
+Chr	3L	3L
+Chr	4	4
+Chr	3R	3R
+Chr	Y	Y
+Chr	MT	mitochondrion_genome

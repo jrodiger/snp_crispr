@@ -1,5 +1,6 @@
 # SNP CRISPR
-SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, Zebrafish, and Rat genomes. Online version available at: [https://www.flyrnai.org/tools/snp_crispr](https://www.flyrnai.org/tools/snp_crispr)
+SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, Zebrafish, and Rat genomes.  
+Online version available at: [https://www.flyrnai.org/tools/snp_crispr](https://www.flyrnai.org/tools/snp_crispr)
 
 ## Prerequisites
 - Anaconda or Miniconda for environment management
@@ -33,7 +34,7 @@ SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, 
 **Verena Chung** - [vpchung](https://github.com/vpchung)
 
 ## License
-This project is licensed under the MIT license - see [LICENSE.txt](LICENSE.txt) for details
+This project is licensed under the MIT license - see [LICENSE](LICENSE) for details
 
 ## Acknowledgements
 **Perrimon Lab** (https://perrimon.med.harvard.edu/)    

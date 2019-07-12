@@ -3,9 +3,9 @@ SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, 
 
 ## Prerequisites
 - Anaconda or Miniconda for environment management
+- Species genome in fasta format
 
 **Note:** To install without conda, see `environment.yml` for dependencies
-- Species genome in fasta format
 
 ## Install
 - From project directory run `conda env create -f environment.yml`
@@ -29,8 +29,7 @@ SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, 
 - Mouse: `./snp_crispr.sh mm mm_snps.csv -NGG`
 
 ## Authors
-**Jonathan Rodiger** - [jrodiger](https://github.com/jrodiger)
-
+**Jonathan Rodiger** - [jrodiger](https://github.com/jrodiger)  
 **Verena Chung** - [vpchung](https://github.com/vpchung)
 
 ## License

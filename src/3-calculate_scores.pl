@@ -33,7 +33,7 @@ my $header = <REPORT>;
 chomp $header;
 
 open( FINAL, '>', $OUTPUT ) or die $!;
-say FINAL join( ',', $header, 'wt_ote' , 'wt_eff', 'variant_ote', 'variant_eff' );
+say FINAL join( ',', $header, 'wt_off_target' , 'wt_efficiency', 'variant_off_target', 'variant_efficiency' );
 
 my $wt_otes  = calculate_ote( $B1 );
 my $snp_otes = calculate_ote( $B2 );

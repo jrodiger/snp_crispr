@@ -24,6 +24,8 @@ Online version available at: [https://www.flyrnai.org/tools/snp_crispr](https://
 - Running with `-all` argument designs guides where all SNPs are targeted within the 23-mer
 - Design results found in `results.csv`
 
+**Note:** The pipeline can be run using any species or genome assembly by adding a new chromosome name to fasta id mapping file in the same format as the examples in `fasta_files/<species>_chr_ids.txt` and then following the same installation instructions
+
 ## Example Commands
 - Fly: `./snp_crispr.sh dm dm_snps.csv -NGG -all`
 - Human: `./snp_crispr.sh hs hs_snps.csv -NAG -all`

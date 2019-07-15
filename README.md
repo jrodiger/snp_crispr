@@ -29,6 +29,15 @@ Online version available at: [https://www.flyrnai.org/tools/snp_crispr](https://
 - Human: `./snp_crispr.sh hs hs_snps.csv -NAG -all`
 - Mouse: `./snp_crispr.sh mm mm_snps.csv -NGG`
 
+## Design Scores
+**Housden Efficiency Score**  
+- These scores were computed using a position matrix. Detailed information about the input dataset and the algorithm can be found in Housden et al. Sci Signal. 2015 https://www.ncbi.nlm.nih.gov/pubmed/26350902
+- Scores range from 1.47-12.32 (higher is better, > 5 recommended)
+
+**Off Target Score**  
+- Calculated based on sgRNA sequence blast results.
+- Scores range from 0-5441.73 (lower is better, < 1 recommended)
+
 ## Authors
 **Jonathan Rodiger** - [jrodiger](https://github.com/jrodiger)  
 **Verena Chung** - [vpchung](https://github.com/vpchung)

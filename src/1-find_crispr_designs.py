@@ -30,17 +30,24 @@ def chr_id_mapping():
     return chrom_map
 
 
-# Returns all chromosomes in user_input csv
-def get_chr_ids():
-    chr_ids = []
+# Returns all chromosomes + first and last snp in each from input
+def get_chr_locs():
+    chr_locs = {}
     with open(user_input, 'r') as f:
         for line in f:
             if header in line:
                 continue
-            chromosome = line.split(',')[1]
-            if chromosome not in chr_ids:
-                chr_ids.append(chromosome)
-    return chr_ids
+            data = line.split(',')
+            chromosome = data[1]
+            position = int(data[2])
+            if chromosome not in chr_locs:
+                chr_locs[chromosome] = [position, position]
+            else:
+                if chr_locs[chromosome][0] > position:
+                    chr_locs[chromosome][0] = position
+                if chr_locs[chromosome][1] < position:
+                    chr_locs[chromosome][1] = position
+    return chr_locs
 
 
 # Returns list of snps that don't match the reference genome
@@ -132,12 +139,13 @@ def snp_list():
 # Returns list crispr designs (23-bp) found on either strand of sequence.
 def get_kmers():
     crisprs = makehash()
-    kmer_len = 23
-    for chr_id in chromosomes:
+    for chr_id in chr_locs:
         seq = load_sequence(chr_id)
-        i = 0
-        while i + kmer_len < len(seq):
-            kmer = seq[i: i + kmer_len]
+        first_snp = chr_locs[chr_id][0]
+        last_snp = chr_locs[chr_id][1]
+        i = first_snp - 24
+        while i < last_snp + 23:
+            kmer = seq[i: i + 23]
             rev = str(Seq(kmer).reverse_complement())
             if check_terminator(kmer):
                 crisprs[chr_id][i + 1] = [i + 23, kmer, '+']
@@ -166,7 +174,7 @@ def print_crisprs():
     # Create hashes so that each guide sequence is only printed once in FASTA file.
     wt_fasta = {}
     snp_fasta = {}
-    for chr_id in chromosomes:
+    for chr_id in chr_locs:
         for start_pos in sorted(crisprs[chr_id]):
             targets = makehash()
             end = crisprs[chr_id][start_pos][0]
@@ -213,14 +221,15 @@ def print_crisprs():
                             find_permutations(variant_seqs[0])
                             variant_seqs = seq_permutations
                         for variant_seq in variant_seqs:
-                            with open(outputfilename + '-snp_summary.csv', 'a') as out:
-                                out.write(gene + ',' + chr_id + ',' + str(start_pos) + ',' + str(end) + ',' 
-                                        + strand + ',' + str(position) + ',' + snp[0:2] 
-                                        # check which variant at snp position for current snp design
-                                        + variant_seq[abs(start_pos-position)] + ',' + str(sequence) + ',' 
-                                        + variant_seq + '\n')
-                            snp_fasta[variant_seq] = None
-                            wt_fasta[sequence] = None
+                            if check_terminator(variant_seq):
+                                with open(outputfilename + '-snp_summary.csv', 'a') as out:
+                                    out.write(gene + ',' + chr_id + ',' + str(start_pos) + ',' + str(end) + ',' 
+                                            + strand + ',' + str(position) + ',' + snp[0:2] 
+                                            # check which variant at snp position for current snp design
+                                            + variant_seq[abs(start_pos-position)] + ',' + str(sequence) + ',' 
+                                            + variant_seq + '\n')
+                                snp_fasta[variant_seq] = None
+                                wt_fasta[sequence] = None
                 if all_flag:
                     snp_pos = designs.keys()
                     variant_seqs = [''.join(bases)]
@@ -230,14 +239,15 @@ def print_crisprs():
                         find_permutations(variant_seqs[0])
                         variant_seqs = seq_permutations
                     for variant_seq in variant_seqs:
-                        with open(outputfilename + '-snp_summary.csv', 'a') as out:
-                            out.write(gene + ',' + chr_id + ',' + str(start_pos) + ',' + str(end) + ','
-                                    + strand + ',' + ';'.join(str(v) for v in snp_pos) + ','
-                                    # check which variant at each position for current snp design
-                                    + ';'.join(str(designs[v][0:2] + variant_seq[abs(start_pos-v)]) for v in snp_pos) 
-                                    + ',' + str(sequence) + ',' + variant_seq + '\n')
-                        snp_fasta[variant_seq] = None
-                        wt_fasta[sequence] = None
+                        if check_terminator(variant_seq):
+                            with open(outputfilename + '-snp_summary.csv', 'a') as out:
+                                out.write(gene + ',' + chr_id + ',' + str(start_pos) + ',' + str(end) + ','
+                                        + strand + ',' + ';'.join(str(v) for v in snp_pos) + ','
+                                        # check which variant at each position for current snp design
+                                        + ';'.join(str(designs[v][0:2] + variant_seq[abs(start_pos-v)]) for v in snp_pos) 
+                                        + ',' + str(sequence) + ',' + variant_seq + '\n')
+                            snp_fasta[variant_seq] = None
+                            wt_fasta[sequence] = None
     # Print FASTA files for BLAST in next step.
     print_fasta(wt_fasta, outputfilename + '-designs_wt.fasta')
     print_fasta(snp_fasta, outputfilename + '-designs_snp.fasta')
@@ -321,7 +331,7 @@ if __name__ == '__main__':
     header = 'gene_symbol,chromosome,position,strand,reference,variant,group(optional)'
     fasta_index = SeqIO.index('fasta_files/' + species + '.fasta', 'fasta')
     id_map = chr_id_mapping()
-    chromosomes = get_chr_ids()
+    chr_locs = get_chr_locs()
     seq_permutations = []
 
     # set regex for chosen PAM

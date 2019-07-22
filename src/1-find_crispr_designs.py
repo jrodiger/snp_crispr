@@ -30,7 +30,7 @@ def chr_id_mapping():
     return chrom_map
 
 
-# Returns all chromosomes + first and last snp in each from input
+# Returns all chromosomes + ranges that overlap input positions
 def get_chr_locs():
     chr_locs = {}
     with open(user_input, 'r') as f:
@@ -41,13 +41,29 @@ def get_chr_locs():
             chromosome = data[1]
             position = int(data[2])
             if chromosome not in chr_locs:
-                chr_locs[chromosome] = [position, position]
-            else:
-                if chr_locs[chromosome][0] > position:
-                    chr_locs[chromosome][0] = position
-                if chr_locs[chromosome][1] < position:
-                    chr_locs[chromosome][1] = position
+                chr_locs[chromosome] = []
+            chr_locs[chromosome].append( (position-24, position+23) )
+    for chromosome in chr_locs:
+        merged = merge_ranges(chr_locs[chromosome])
+        chr_locs[chromosome] = merged
     return chr_locs
+
+
+# Returns overlapping ranges merged
+def merge_ranges(ranges):
+    result = []
+    current_start = -1
+    current_stop = -1 
+    for start, stop in sorted(ranges):
+        if start > current_stop:
+            # current range starts after the last range stops, start new range
+            result.append( (start, stop) )
+            current_start, current_stop = start, stop
+        else:
+            # ranges overlap, update current range
+            result[-1] = (current_start, stop)
+            current_stop = max(current_stop, stop)
+    return result
 
 
 # Returns list of snps that don't match the reference genome
@@ -141,17 +157,16 @@ def get_kmers():
     crisprs = makehash()
     for chr_id in chr_locs:
         seq = load_sequence(chr_id)
-        first_snp = chr_locs[chr_id][0]
-        last_snp = chr_locs[chr_id][1]
-        i = first_snp - 24
-        while i < last_snp + 23:
-            kmer = seq[i: i + 23]
-            rev = str(Seq(kmer).reverse_complement())
-            if check_terminator(kmer):
-                crisprs[chr_id][i + 1] = [i + 23, kmer, '+']
-            if check_terminator(rev):
-                crisprs[chr_id][i + 23] = [i + 1, rev, '-']
-            i += 1
+        for start, stop in chr_locs[chr_id]:
+            i = start
+            while i < stop:
+                kmer = seq[i: i + 23]
+                rev = str(Seq(kmer).reverse_complement())
+                if check_terminator(kmer):
+                    crisprs[chr_id][i + 1] = [i + 23, kmer, '+']
+                if check_terminator(rev):
+                    crisprs[chr_id][i + 23] = [i + 1, rev, '-']
+                i += 1
     return crisprs
 
 

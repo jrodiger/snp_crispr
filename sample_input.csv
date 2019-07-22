@@ -1,4 +1,5 @@
 gene_symbol,chromosome,position,strand,reference,variant,group(optional)
-NA,2L,306360,+,G,C,1
-NA,2L,19957942,+,G,A,2
-NA,2L,19957942,+,G,C,2
+NA,2L,8471348,-,C,G,1
+NA,2R,19516783,+,T,A,2
+NA,3L,14275690,+,T,G,3
+NA,3L,14275690,+,T,C,3

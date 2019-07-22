@@ -42,7 +42,7 @@ if __name__ == '__main__':
 			for line in f:
 				summary_lines.append(line)
 				data = line.split(',')
-				if data[7] in bad_designs or data[8] in bad_designs:
+				if data[7] in bad_design_list or data[8] in bad_design_list:
 					bad_summary_lines.append(line)
 		with open(final_summary, 'w') as out:
 			for line in summary_lines:

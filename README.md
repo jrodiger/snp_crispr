@@ -25,7 +25,7 @@ Zebrafish - https://www.ncbi.nlm.nih.gov/genome/?term=txid7955
 Rat - https://www.ncbi.nlm.nih.gov/genome?term=txid10116  
 
 ## Usage
-- Add SNP's of interest to input csv file, see `sample_input.csv` for format
+- Add SNP's or INDEL's of interest to input csv file, see `sample_input.csv` for format
 - From project directory run `./snp_crispr.sh <species> <input_file> <PAM> <all>`
 - Both `-NGG` and `-NAG` PAM sequences supported
 - Running with `-all` argument designs guides where all SNPs are targeted within the 23-mer

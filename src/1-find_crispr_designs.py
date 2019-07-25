@@ -40,6 +40,11 @@ def get_chr_locs():
             data = line.split(',')
             chromosome = data[1]
             position = int(data[2])
+            reference = data[3]
+            variant = data[4]
+            # skip indels in input for now
+            if len(reference) > 1 or len(variant) > 1:
+                continue
             if chromosome not in chr_locs:
                 chr_locs[chromosome] = []
             chr_locs[chromosome].append( (position-24, position+23) )
@@ -86,7 +91,10 @@ def check_valid_SNPs():
             if strand == '-':
                 seq = str(Seq(seq).complement())
             try:
-                ref = seq[snp_pos-1]
+                if len(input_ref) == 1:
+                    ref = seq[snp_pos-1]
+                else:
+                    ref = seq[snp_pos-1:snp_pos-1+len(input_ref)]
                 if input_ref != ref:
                     invalid_snps.append(line)
                     with open('error.log', 'a') as out:
@@ -115,9 +123,9 @@ def log_mismatch(file, gene, chromosome, snp_pos, strand, input_ref, input_var, 
     file.write('Input: ' + input_ref + ' (position: ' + str(snp_pos) + ') \n')
 
 
-# Returns list of SNPs of interest, giving results on both strands. 
-def snp_list():
-    snps = makehash()
+# Returns list of variants of interest, giving results on both strands. 
+def variant_list(variant_type):
+    variants = makehash()
     invalid_snps = check_valid_SNPs()
     with open(user_input, 'r') as f:
         for line in f:
@@ -126,33 +134,38 @@ def snp_list():
             data       = line.strip().split(',')
             gene       = data[0]
             chromosome = data[1]
-            position   = data[2]
+            position   = int(data[2])
             strand     = data[3]
             reference  = data[4].upper()
             variant    = data[5].upper()
             group      = data[6]
+            # skip lines that don't match variant type
+            if (len(reference) != 1 or len(variant) != 1) and variant_type == 'snp':
+                continue
+            if (len(reference) == 1 and len(variant) == 1) and variant_type == 'indel':
+                continue
             if group != '':
                 gene += ' (' + group + ')'
-            snp = reference + '>' + variant
-            rev = str(Seq(snp).complement())
+            fwd = reference + '>' + variant
+            rev = str(Seq(fwd).complement())
             i = 0
             # seperate variants at same position w/ comma
             if strand == '+':
-                if snps[chromosome][gene][int(position)]:
-                    snps[chromosome][gene][int(position)]['+'] += ',' + variant
-                    snps[chromosome][gene][int(position)]['-'] += ',' + str(Seq(variant).complement())
+                if variants[chromosome][gene][position]:
+                    variants[chromosome][gene][position]['+'] += ',' + variant
+                    variants[chromosome][gene][position]['-'] += ',' + str(Seq(variant).complement())
                 else:
-                    snps[chromosome][gene][int(position)] = {'+': snp, '-': rev}
+                    variants[chromosome][gene][position] = {'+': fwd, '-': rev}
             else:
-                if snps[chromosome][gene][int(position)]:
-                    snps[chromosome][gene][int(position)]['+'] += ',' + str(Seq(variant).complement())
-                    snps[chromosome][gene][int(position)]['-'] += ',' + variant
+                if variants[chromosome][gene][position]:
+                    variants[chromosome][gene][position]['+'] += ',' + str(Seq(variant).complement())
+                    variants[chromosome][gene][position]['-'] += ',' + variant
                 else:
-                    snps[chromosome][gene][int(position)] = {'+': rev, '-': snp}
-    return snps
+                    variants[chromosome][gene][position] = {'+': rev, '-': fwd}
+    return variants
 
 
-# Returns list crispr designs (23-bp) found on either strand of sequence.
+# Returns list of crispr designs (23-bp) found on either strand of sequence.
 def get_kmers():
     crisprs = makehash()
     for chr_id in chr_locs:
@@ -173,19 +186,19 @@ def get_kmers():
 # Returns true if U6 terminator (TTTT) is not present.
 def check_terminator(subseq):
     # Don't include PAM in search.
-    m = re.search(regex, str(subseq))
+    m = re.search(regex, str(subseq).upper())
     try:
         return 'TTTT' not in m.group(1)
     except AttributeError:
         return False
 
 
-def print_crisprs():
-    snps = snp_list()
+def snp_crisprs():
+    snps = variant_list('snp')
     crisprs = get_kmers()
     global seq_permutations
     with open(outputfilename + '-snp_summary.csv', 'w') as output_file:
-        output_file.write('gene,chromosome,start,end,strand,snp_pos,snp,wt_crispr,variant_crispr\n')
+        output_file.write('gene,chromosome,start,end,strand,variant_pos,variant,wt_crispr,variant_crispr\n')
     # Create hashes so that each guide sequence is only printed once in FASTA file.
     wt_fasta = {}
     snp_fasta = {}
@@ -199,11 +212,11 @@ def print_crisprs():
                 for position in sorted(snps[chr_id][gene]):
                     # skip designs in non-variable part of PAM
                     if strand == '+':
-                        if position < start_pos or position > (end - 2):
+                        if position < start_pos or position > (end - 3):
                             continue
                         index = position - start_pos
                     else:
-                        if position > start_pos or position < (end + 2):
+                        if position > start_pos or position < (end + 3):
                             continue
                         index = start_pos - position
                     targets[gene][index] = [
@@ -328,6 +341,89 @@ def print_fasta(designs, filename):
                 output_file.write(str(seq) + '\n')
 
 
+# Designs guides that overlap w/ insertions/deletions
+def indel_crisprs():
+    indels = variant_list('indel')
+    # Create hashes so that each guide sequence is only printed once in FASTA file.
+    wt_fasta = {}
+    var_fasta = {}
+    # fwd strand
+    wt_fasta, var_fasta = design_indels(indels, wt_fasta, var_fasta, '+')
+    # rev strand
+    wt_fasta, var_fasta = design_indels(indels, wt_fasta, var_fasta, '-')
+    # Print FASTA files for BLAST in next step.
+    print_fasta(wt_fasta, outputfilename + '-designs_wt.fasta')
+    print_fasta(var_fasta, outputfilename + '-designs_snp.fasta')
+
+
+# Iterates through list of input indels on specified strand + returns design dictionaries
+def design_indels(indels, wt_fasta, var_fasta, strand):
+    for chr_id in indels:
+        seq = load_sequence(chr_id)
+        if strand == '-':
+            seq = str(Seq(seq).complement())
+        for gene in indels[chr_id]:
+            for pos in indels[chr_id][gene]:
+                indel = indels[chr_id][gene][pos][strand]
+                ref, variants = indel.split('>')
+                for variant in variants.split(','):
+                    alt_seq = modify_ref_seq(seq, pos, ref, variant)
+                    wt_fasta, var_fasta = indel_kmers(gene, chr_id, seq, alt_seq, pos, 
+                                            strand, ref, variant, wt_fasta, var_fasta)
+    return wt_fasta, var_fasta
+
+
+# Returns updated dictionaries of crispr designs (23-bp)
+def indel_kmers(gene, chr_id, seq, alt_seq, pos, strand, ref, variant, wt_fasta, var_fasta):
+    crisprs = []
+    start   = pos - 23
+    stop    = pos
+    if len(variant) > 1:
+        stop += len(variant) - 1
+    i = start
+    while i < stop:
+        kmer_start = i
+        kmer_stop  = i + 23
+        ref_kmer   = seq[kmer_start:kmer_stop]
+        alt_kmer   = alt_seq[kmer_start:kmer_stop]
+        # genome coordinates are 1-based
+        tmp_start  = kmer_start + 1
+        tmp_stop   = kmer_stop
+        tmp_ref    = ref
+        tmp_var    = variant
+        if strand == '-':
+            # reverse sequences because already using complement
+            ref_kmer  = ref_kmer[::-1]
+            alt_kmer  = alt_kmer[::-1]
+            tmp_ref   = ref[::-1]
+            tmp_var   = variant[::-1]
+            tmp_start = kmer_stop
+            tmp_stop  = kmer_start + 1
+        # only check mutant design for PAM and U6 terminator
+        if check_terminator(alt_kmer):
+            with open(outputfilename + '-snp_summary.csv', 'a') as out:
+                out.write(gene + ',' + chr_id + ',' + str(tmp_start) + ',' + str(tmp_stop) + ',' 
+                        + strand + ',' + str(pos) + ',' + tmp_ref + '>' + tmp_var + ',' + ref_kmer
+                        + ',' + alt_kmer + '\n')
+            wt_fasta[ref_kmer] = None
+            var_fasta[alt_kmer] = None
+        i += 1
+    return wt_fasta, var_fasta
+
+
+# Returns reference sequence modified w/ insertion/deletion
+def modify_ref_seq(seq, pos, ref, variant):
+    alt_seq = list(seq)
+    if len(ref) > 1:
+        start = pos - 1
+        stop = start + len(ref)
+        alt_seq = ''.join(alt_seq[0:start]) + variant + ''.join(alt_seq[stop:])
+    else:
+        alt_seq[pos - 1] = variant
+        alt_seq = ''.join(alt_seq)
+    return alt_seq
+
+
 if __name__ == '__main__':
     # Read in command line arguments
     if len(sys.argv) != 5 and len(sys.argv) != 6:
@@ -357,4 +453,5 @@ if __name__ == '__main__':
     else:
         raise ValueError('invalid pam')
 
-    print_crisprs()
+    snp_crisprs()
+    indel_crisprs()

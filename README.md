@@ -49,7 +49,7 @@ Rat - https://www.ncbi.nlm.nih.gov/genome?term=txid10116
 - Scores range from 0-5441.73 (lower is better, < 1 recommended)
 
 ## Precomputed Human Clinically Associated SNP Targeted Designs
-- Precomputed CRISPR design results provided in [clinical_hs_snp_designs.csv](results/clinical_hs_designs.csv)
+- Precomputed CRISPR design results provided in [clinical_hs_snp_designs.csv](results/clinical_hs_snp_designs.csv)
 - Clinically associated variant data from [Ensembl](https://ensembl.org/Homo_sapiens)
 
 ## Authors

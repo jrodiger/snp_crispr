@@ -9,7 +9,7 @@ Online version available at: [https://www.flyrnai.org/tools/snp_crispr](https://
 **Note:** To install without conda, see `environment.yml` for dependencies
 
 ## Install
-- From project directory run `conda env create -f environment.yml`
+- From the project directory run `conda env create -f environment.yml`
 - Then `conda activate snp_crispr`
 - FlyBase release 6.28 genome fasta file and blast database are included for testing. `dm.fasta.zip` must be unzipped before running. Remaining installation steps are only necessary for other species
 - Download species genome fasta file and put in `fasta_files/<species>.fasta`
@@ -26,11 +26,11 @@ Rat - https://www.ncbi.nlm.nih.gov/genome?term=txid10116
 
 ## Usage
 - Add SNP's or INDEL's of interest to input csv file, see `sample_input.csv` for format
-- From project directory run `./snp_crispr.sh <species> <input_file> <PAM> <all>`
+- From the project directory run `./snp_crispr.sh <species> <input_file> <PAM> <all>`
 - Both `-NGG` and `-NAG` PAM sequences supported
 - Running with `-all` argument designs guides where all SNPs are targeted within the 23-mer
-- Design results found in `results.csv`
-- To test the pipeline run `./snp_crispr.sh dm sample_input.csv -NGG` and compare the output in `results.csv` with `expected_results.csv`
+- Design results found in `results/designs.csv`
+- To test the pipeline run `./snp_crispr.sh dm sample_input.csv -NGG` and compare the output in `results/designs.csv` with `results/expected_results.csv`
 
 **Note:** The pipeline can be run using any species or genome assembly by adding a new chromosome name to fasta id mapping file in the same format as the examples in `fasta_files/<species>_chr_ids.txt` and then following the same installation instructions
 

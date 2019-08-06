@@ -1,5 +1,6 @@
 gene_symbol,chromosome,position,strand,reference,variant,group(optional)
-NA,2L,8471348,-,C,G,1
-NA,2R,19516783,+,T,A,2
-NA,3L,14275690,+,T,G,3
-NA,3L,14275690,+,T,C,3
+NA,2L,8471348,-,C,G,snp1
+NA,3L,14275690,+,T,G,snp2
+NA,3L,14275690,+,T,C,snp3
+NA,2L,7310396,+,CAACTGA,C,indel1
+NA,2L,7310843,+,C,CCCGTT,indel2

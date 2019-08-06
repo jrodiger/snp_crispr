@@ -277,8 +277,8 @@ def snp_crisprs():
                             snp_fasta[variant_seq] = None
                             wt_fasta[sequence] = None
     # Print FASTA files for BLAST in next step.
-    print_fasta(wt_fasta, outputfilename + '-designs_wt.fasta')
-    print_fasta(snp_fasta, outputfilename + '-designs_snp.fasta')
+    print_fasta(wt_fasta, outputfilename + '-wt.fasta')
+    print_fasta(snp_fasta, outputfilename + '-snp.fasta')
 
 
 # Finds all permutations of sequence w/ multiple variants at same position
@@ -352,8 +352,8 @@ def indel_crisprs():
     # rev strand
     wt_fasta, var_fasta = design_indels(indels, wt_fasta, var_fasta, '-')
     # Print FASTA files for BLAST in next step.
-    print_fasta(wt_fasta, outputfilename + '-designs_wt.fasta')
-    print_fasta(var_fasta, outputfilename + '-designs_snp.fasta')
+    print_fasta(wt_fasta, outputfilename + '-wt.fasta')
+    print_fasta(var_fasta, outputfilename + '-snp.fasta')
 
 
 # Iterates through list of input indels on specified strand + returns design dictionaries

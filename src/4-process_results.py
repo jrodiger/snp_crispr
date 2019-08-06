@@ -39,7 +39,7 @@ def lowercase_indels(ref, variant, start, stop, position, strand, wt_crispr, var
 		tmp = start
 		start = stop
 		stop = tmp
-		wt_crispr      = str(Seq(wt_crispr).reverse_complement())
+		wt_crispr = str(Seq(wt_crispr).reverse_complement())
 		variant_crispr = str(Seq(variant_crispr).reverse_complement())
 	wt_crispr = list(wt_crispr)
 	variant_crispr = list(variant_crispr)

@@ -34,6 +34,11 @@ def lowercase_snps(wt_crispr, variant_crispr):
 
 # Returns designs w/ indel variant positions as lowercase
 def lowercase_indels(ref, variant, start, stop, position, strand, wt_crispr, variant_crispr):
+	# only convert to int for indels because snps can have multiple
+	# positions for the same design seperated by semicolons
+	start    = int(start)
+	stop     = int(stop)
+	position = int(position)
 	# modify reverse complement, then switch back when done
 	if strand == '-':
 		tmp = start
@@ -137,11 +142,12 @@ if __name__ == '__main__':
 		header = next(f).strip('\n')
 		for line in f:
 			data           = line.strip('\n').split(',')
-			start          = int(data[2])
-			stop           = int(data[3])
+			start          = data[2]
+			stop           = data[3]
 			strand         = data[4]
-			position       = int(data[5])
-			ref, variant   = data[6].split('>')
+			position       = data[5]
+			# only store first snp if multiple, used for indels
+			ref, variant   = data[6].split(';')[0].split('>')
 			wt_crispr      = data[7]
 			variant_crispr = data[8]
 			# snps

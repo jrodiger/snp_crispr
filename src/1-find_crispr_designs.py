@@ -384,7 +384,11 @@ def indel_kmers(gene, chr_id, seq, alt_seq, pos, strand, ref, variant, wt_fasta,
     stop    = pos
     if len(variant) > 1:
         stop += len(variant) - 1
-    i = start
+    # check if input position is close to start of chromosome
+    if start < 0:
+        i = 0
+    else:
+        i = start
     while i < stop:
         kmer_start = i
         kmer_stop  = i + 23

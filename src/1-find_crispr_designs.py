@@ -47,7 +47,11 @@ def get_chr_locs():
                 continue
             if chromosome not in chr_locs:
                 chr_locs[chromosome] = []
-            chr_locs[chromosome].append( (position-24, position+23) )
+            start = position - 24
+            stop  = position + 23
+            if start < 0:
+                start = 0
+            chr_locs[chromosome].append( (start, stop) )
     for chromosome in chr_locs:
         merged = merge_ranges(chr_locs[chromosome])
         chr_locs[chromosome] = merged

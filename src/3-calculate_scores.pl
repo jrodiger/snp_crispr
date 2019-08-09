@@ -59,11 +59,13 @@ close FINAL;
 sub calculate_ote {
 	my ( $input ) = @_;
 
+	my $ote_numbers = 'tmp/' . $filename . '_ote_numbers.txt';
+
 	# Create temp file of OT scores pre-processed.
-	`cut -f6,11-12,14 $input > tmp/ote_numbers.txt`;
+	`cut -f6,11-12,14 $input > $ote_numbers`;
 
 	my $otes;
-	open( OT, '<', 'tmp/ote_numbers.txt' ) or die $!;
+	open( OT, '<', $ote_numbers ) or die $!;
 	while (<OT>) {
 		chomp;
 		my ( $crispr, $ot1, $ot2, $type ) = split "\t";
@@ -78,7 +80,7 @@ sub calculate_ote {
 	close OT;
 
 	# Remove temp file.
-	`rm tmp/ote_numbers.txt`;
+	`rm $ote_numbers`;
 
 	my $scores;
 	foreach my $crispr ( keys %$otes ) {

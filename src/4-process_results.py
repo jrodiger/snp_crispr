@@ -168,7 +168,3 @@ if __name__ == '__main__':
 		out.write(header + ',dist_to_pam\n')
 		for line in summary_lines:
 			out.write(line)
-
-	# remove tmp files
-	shutil.rmtree('tmp')
-	os.makedirs('tmp')

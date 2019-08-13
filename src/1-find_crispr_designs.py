@@ -76,44 +76,52 @@ def merge_ranges(ranges):
 
 
 # Returns list of snps that don't match the reference genome
-def check_valid_SNPs():
-    invalid_snps = []
+def check_valid_variants():
+    input_lines = makehash()
+    invalid_variants = []
     with open(user_input, 'r') as f:
         for line in f:
             if header in line:
                 continue
-            data       = line.strip().split(',')
-            gene       = data[0]
+            data = line.split(',')
             chromosome = data[1]
-            snp_pos    = int(data[2])
-            strand     = data[3]
-            input_ref  = data[4].upper()
-            input_var  = data[5].upper()
-            start      = snp_pos - 11
-            stop       = snp_pos + 10
-            seq        = load_sequence(chromosome)
+            strand = data[3]
+            if strand not in input_lines[chromosome]:
+                input_lines[chromosome][strand] = []
+            input_lines[chromosome][strand].append(line.strip())
+    for chromosome in input_lines:
+        seq = load_sequence(chromosome)
+        for strand in ['+', '-']:
             if strand == '-':
                 seq = str(Seq(seq).complement())
-            try:
-                if len(input_ref) == 1:
-                    ref = seq[snp_pos-1]
-                else:
-                    ref = seq[snp_pos-1:snp_pos-1+len(input_ref)]
-                if input_ref != ref:
-                    invalid_snps.append(line)
+            for line in input_lines[chromosome][strand]:
+                data       = line.split(',')
+                gene       = data[0]
+                snp_pos    = int(data[2])
+                input_ref  = data[4].upper()
+                input_var  = data[5].upper()
+                start      = snp_pos - 11
+                stop       = snp_pos + 10
+                try:
+                    if len(input_ref) == 1:
+                        ref = seq[snp_pos-1]
+                    else:
+                        ref = seq[snp_pos-1:snp_pos-1+len(input_ref)]
+                    if input_ref != ref:
+                        invalid_variants.append(line)
+                        with open('error.log', 'a') as out:
+                            log_mismatch(out, gene, chromosome, snp_pos, strand, input_ref, input_var, start, stop)
+                            out.write('Reference: ' + ref + ' (position: ' + str(snp_pos) + ') \n')
+                            out.write('Surrounding region of reference: ' + seq[start:stop] 
+                                + ' (Start: ' + str(start+1) + ', Stop: ' + str(stop) + ') \n\n\n')
+                except IndexError:
+                    invalid_variants.append(line)
                     with open('error.log', 'a') as out:
                         log_mismatch(out, gene, chromosome, snp_pos, strand, input_ref, input_var, start, stop)
-                        out.write('Reference: ' + ref + ' (position: ' + str(snp_pos) + ') \n')
-                        out.write('Surrounding region of reference: ' + seq[start:stop] 
-                            + ' (Start: ' + str(start+1) + ', Stop: ' + str(stop) + ') \n\n\n')
-            except IndexError:
-                invalid_snps.append(line)
-                with open('error.log', 'a') as out:
-                    log_mismatch(out, gene, chromosome, snp_pos, strand, input_ref, input_var, start, stop)
-                    out.write('---------------------------\n')
-                    out.write('Warning index out of range\n')
-                    out.write('---------------------------\n\n\n')
-    return invalid_snps
+                        out.write('---------------------------\n')
+                        out.write('Warning index out of range\n')
+                        out.write('---------------------------\n\n\n')
+    return invalid_variants
 
 
 # Write out information about input reference mismatch
@@ -130,10 +138,10 @@ def log_mismatch(file, gene, chromosome, snp_pos, strand, input_ref, input_var, 
 # Returns list of variants of interest, giving results on both strands. 
 def variant_list(variant_type):
     variants = makehash()
-    invalid_snps = check_valid_SNPs()
+    invalid_variants = check_valid_variants()
     with open(user_input, 'r') as f:
         for line in f:
-            if line in invalid_snps or header in line:
+            if line in invalid_variants or header in line:
                 continue
             data       = line.strip().split(',')
             gene       = data[0]

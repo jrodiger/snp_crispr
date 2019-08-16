@@ -35,7 +35,7 @@ def get_chr_locs():
     chr_locs = {}
     with open(user_input, 'r') as f:
         for line in f:
-            if header in line:
+            if line in invalid_variants or header in line:
                 continue
             data = line.split(',')
             chromosome = data[1]
@@ -138,7 +138,6 @@ def log_mismatch(file, gene, chromosome, snp_pos, strand, input_ref, input_var, 
 # Returns list of variants of interest, giving results on both strands. 
 def variant_list(variant_type):
     variants = makehash()
-    invalid_variants = check_valid_variants()
     with open(user_input, 'r') as f:
         for line in f:
             if line in invalid_variants or header in line:
@@ -205,6 +204,7 @@ def check_terminator(subseq):
         return False
 
 
+# Designs snp targeted crisprs
 def snp_crisprs():
     snps = variant_list('snp')
     crisprs = get_kmers()
@@ -458,6 +458,7 @@ if __name__ == '__main__':
     header = 'gene_symbol,chromosome,position,strand,reference,variant,group(optional)'
     fasta_index = SeqIO.index('fasta_files/' + species + '.fasta', 'fasta')
     id_map = chr_id_mapping()
+    invalid_variants = check_valid_variants()
     chr_locs = get_chr_locs()
     seq_permutations = []
 

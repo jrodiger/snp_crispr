@@ -35,6 +35,7 @@ chomp $header;
 open( FINAL, '>', $OUTPUT ) or die $!;
 say FINAL join( ',', $header, 'wt_off_target' , 'wt_efficiency', 'variant_off_target', 'variant_efficiency' );
 
+our $on_target_hits;
 my $wt_otes  = calculate_ote( $B1 );
 my $snp_otes = calculate_ote( $B2 );
 my $pssm = load_pssm( 'src/p_values.txt' );
@@ -45,13 +46,17 @@ while (<REPORT>) {
 	my @columns = split ',';
 	my $wt      = $columns[7];
 	my $snp     = $columns[8];
-	
-	print FINAL $_;
-	print FINAL ',', ( $wt_otes->{$wt} || '0' );
-	print FINAL ',', score_match( $wt, $pssm );
-	print FINAL ',', ( $snp_otes->{$snp} || '0' );
-	print FINAL ',', score_match( $snp, $pssm );
-	print FINAL "\n";
+
+	if ( $on_target_hits->{$wt} == 1 && $on_target_hits->{$snp} // 0 == 0 ) {
+		print FINAL $_;
+		print FINAL ',', ( $wt_otes->{$wt} || '0' );
+		print FINAL ',', score_match( $wt, $pssm );
+		print FINAL ',', ( $snp_otes->{$snp} || '0' );
+		print FINAL ',', score_match( $snp, $pssm );
+		print FINAL "\n";
+	} else {
+		say $wt;
+	}
 }
 close REPORT;
 close FINAL;
@@ -69,8 +74,10 @@ sub calculate_ote {
 	while (<OT>) {
 		chomp;
 		my ( $crispr, $ot1, $ot2, $type ) = split "\t";
-		next if $type eq 'On-Target';
-
+		if ( $type eq 'On-Target' ) {
+			$on_target_hits->{$crispr}++;
+			next;
+		}
 		my $total = $ot1 + $ot2;
 		if ( $total != 0 and $total < 3 ) {
 			$total = 3;

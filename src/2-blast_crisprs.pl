@@ -73,7 +73,6 @@ sub read_fasta {
             $sequence =~ s/\s//g;
             $sequences{$chrom} = uc $sequence;
         }
-        last;
     }
     close FASTA;
     return \%sequences;
@@ -111,8 +110,8 @@ sub blast_crispr {
             $gaps, $q_start, $q_end, $s_start, $s_end
         ) = split;
         my ( $eight, $unique, $pam, $strand ) = ( 0, 0, 0, '+' );
-        $chrom =~ s/lcl\|//g; # ?? not sure what this does.
-        
+        $chrom =~ s/lcl\|//g; # remove 'lcl|' from id
+
         my $padded_start = sprintf( '%08d', $s_start - $q_start + 1 );
         my $padded_end   = sprintf( '%08d', $s_end + 23 - $q_end );
         if ( $s_start > $s_end ) {

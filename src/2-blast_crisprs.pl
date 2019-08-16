@@ -94,16 +94,10 @@ sub blast_crispr {
     
     open( ALIGN, '>', $args->{output} ) or die $!;
 
-# Diagnostic return -- testing if AJAX is working.
-#return;
-
     open( BLAST, "$cmd |" );
     while (<BLAST>) {
         chomp;
         next if /^#/;
-        
-        # Diagnostic print statement.
-        #say and exit;
         
         my (
             $query_seq, $chrom, $pident, $len, $mismatches, 

@@ -47,15 +47,13 @@ while (<REPORT>) {
 	my $wt      = $columns[7];
 	my $snp     = $columns[8];
 
-	if ( $on_target_hits->{$wt} == 1 && $on_target_hits->{$snp} // 0 == 0 ) {
+	if ( $on_target_hits->{$wt} // 0 <= 1 && $on_target_hits->{$snp} // 0 == 0 ) {
 		print FINAL $_;
 		print FINAL ',', ( $wt_otes->{$wt} || '0' );
 		print FINAL ',', score_match( $wt, $pssm );
 		print FINAL ',', ( $snp_otes->{$snp} || '0' );
 		print FINAL ',', score_match( $snp, $pssm );
 		print FINAL "\n";
-	} else {
-		say $wt;
 	}
 }
 close REPORT;

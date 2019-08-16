@@ -53,7 +53,7 @@ fi
 python src/1-find_crispr_designs.py $species $input tmp/$outputfilename $pam $all
 perl src/2-blast_crisprs.pl -s $species -f1 $wt -f2 $snp -o tmp/$outputfilename -pam $pam
 perl src/3-calculate_scores.pl -b1 $blast_wt -b2 $blast_snp -out $outputfilename
-python src/4-process_results.py $blast_wt $blast_snp results/$outputfilename
+python src/4-process_results.py $blast_wt $blast_snp $input results/$outputfilename
 
 # don't print error log / delete tmp files twice when running in parallel
 if [ "$using_parallel" == false ]; then

@@ -14,6 +14,7 @@ using_parallel=false
 # check for both argument
 if [ "$option1" == "-both" ]; then
 	rm error.log 2>/dev/null
+	rm results/no_designs.csv 2>/dev/null
 	echo "./snp_crispr.sh $species $input $pam 1" > tmp/commands.txt
 	echo "./snp_crispr.sh $species $input $pam -all 2" >> tmp/commands.txt
 	parallel < tmp/commands.txt
@@ -47,6 +48,7 @@ blast_snp="tmp/$outputfilename-snp_blast.txt"
 # don't delete previous error log twice in parallel
 if [ "$using_parallel" == false ]; then
 	rm error.log 2>/dev/null
+	rm results/no_designs.csv 2>/dev/null
 fi
 
 # run pipeline + check error log

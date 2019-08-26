@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
 	# check for failed designs
 	failed_designs = False
-	with open('results/failed_designs.csv', 'w') as out:
+	with open('results/no_designs.csv', 'a') as out:
 		with open(input_file, 'r') as f:
 			out.write('chromosome,position,strand,reference,variant\n')
 			next(f)
@@ -202,4 +202,4 @@ if __name__ == '__main__':
 					failed_designs = True
 					out.write(input_row + '\n')
 	if not failed_designs:
-		os.remove('results/failed_designs.csv')
+		os.remove('results/no_designs.csv')

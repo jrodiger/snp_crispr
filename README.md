@@ -26,21 +26,31 @@ Rat - https://www.ncbi.nlm.nih.gov/genome?term=txid10116
 
 ## Usage
 - Add SNP's or INDEL's of interest to input csv file, see `sample_input.csv` for format
-- From the project directory run `./snp_crispr.sh <species> <input_file> <PAM> <-all/-both>`
+- From the project directory run `./snp_crispr.sh <species> <input_file> <PAM> <threads> <-all/-both>`
 - Both `-NGG` and `-NAG` PAM sequences supported
 - Running with the optional `-all` argument designs guides where all SNPs are targeted within the 23-mer
 - Running with the optional `-both` argument designs guides where all SNPs are targeted within the 23-mer as well as individually
+- **All arguments are required except `-all/-both`**
 - Design results found in `results/designs.csv`
 - Input variants without any viable designs are logged in `results/no_designs.csv`
 - No viable designs may be found targeting a variant due to the lack of a neighboring PAM sequence, presence of the U6 terminator (TTTT), or the unavailability of a unique sgRNA sequence
-- To test the pipeline run `./snp_crispr.sh dm sample_input.csv -NGG` and compare the output in `results/designs.csv` with `results/expected_results.csv`
+- To test the pipeline run `./snp_crispr.sh dm sample_input.csv -NGG 2` and compare the output in `results/designs.csv` with `results/expected_results.csv`
 
 **Note:** The pipeline can be run using any species or genome assembly by adding a new chromosome name to fasta id mapping file in the same format as the examples in `fasta_files/<species>_chr_ids.txt` and then following the same installation instructions
 
+## Multi-Core Performance
+- **2 threads recommended on personal computers with limited RAM**
+- **Increasing the number of threads can significantly increase memory usage depending on the genome size**
+- Setting the threads argument to 2 or more will improve performance when using inputs that span across multiple chromosomes and/or when using the -both argument
+- When running on a cluster or other environment with large amounts of memory available, using as many threads as chromosomes in the input will give optimal performance
+
+**Example:** A test run using 10 threads on an input of 10,000 human snps took \~9 minutes and used \~50 GB of RAM  
+(Results will vary depending on the machine, input, species, and options used)
+
 ## Example Commands
-- Fly: `./snp_crispr.sh dm dm_snps.csv -NGG -all`
-- Human: `./snp_crispr.sh hs hs_snps.csv -NAG -both`
-- Mouse: `./snp_crispr.sh mm mm_snps.csv -NGG`
+- Fly: `./snp_crispr.sh dm dm_snps.csv -NGG 2 -all`
+- Human: `./snp_crispr.sh hs hs_snps.csv -NAG 6 -both`
+- Mouse: `./snp_crispr.sh mm mm_snps.csv -NGG 3`
 
 ## Design Scores
 **Housden Efficiency Score**  

@@ -119,7 +119,6 @@ if __name__ == '__main__':
 	bad_design_list    = []
 	summary_lines      = []
 	bad_summary_lines  = []
-	successful_designs = {}
 
 	# check for severe off targets
 	check_designs(wt_blast)
@@ -153,10 +152,6 @@ if __name__ == '__main__':
 			ref, variant   = data[6].split(';')[0].split('>')
 			wt_crispr      = data[7]
 			variant_crispr = data[8]
-			# store succesfully designed variants
-			for variant in data[6].split(';'):
-				ref, variant = variant.split('>')
-				successful_designs[','.join([chromosome, position, strand, ref, variant])] = None
 			# snps
 			if len(ref) == 1 and len(variant) == 1:
 				wt_crispr, variant_crispr = lowercase_snps(wt_crispr, variant_crispr)
@@ -175,31 +170,3 @@ if __name__ == '__main__':
 		out.write(header + ',dist_to_pam\n')
 		for line in summary_lines:
 			out.write(line)
-
-	# check for failed designs
-	failed_designs = False
-	with open('results/no_designs.csv', 'a') as out:
-		with open(input_file, 'r') as f:
-			out.write('chromosome,position,strand,reference,variant\n')
-			next(f)
-			for line in f:
-				data = line.split(',')
-				chromosome = data[1]
-				position   = data[2]
-				strand     = data[3]
-				ref        = data[4]
-				variant    = data[5]
-				input_row  = ','.join([chromosome, position, strand, ref, variant])
-				# check if design is on opposite strand of input
-				if strand == '+':
-					alt_strand = '-'
-				else:
-					alt_strand = '+'
-				alt_ref = str(Seq(ref).reverse_complement())
-				alt_variant = str(Seq(variant).reverse_complement())
-				alt_input_row = ','.join([chromosome, position, alt_strand, alt_ref, alt_variant])
-				if input_row not in successful_designs and alt_input_row not in successful_designs:
-					failed_designs = True
-					out.write(input_row + '\n')
-	if not failed_designs:
-		os.remove('results/no_designs.csv')

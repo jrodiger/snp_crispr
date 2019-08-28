@@ -35,7 +35,7 @@ def get_chr_locs():
     chr_locs = {}
     with open(user_input, 'r') as f:
         for line in f:
-            if line in invalid_variants or header in line:
+            if line in invalid_variants:
                 continue
             data = line.split(',')
             chromosome = data[1]
@@ -81,8 +81,6 @@ def check_valid_variants():
     invalid_variants = []
     with open(user_input, 'r') as f:
         for line in f:
-            if header in line:
-                continue
             data = line.split(',')
             chromosome = data[1]
             strand = data[3]
@@ -140,7 +138,7 @@ def variant_list(variant_type):
     variants = makehash()
     with open(user_input, 'r') as f:
         for line in f:
-            if line in invalid_variants or header in line:
+            if line in invalid_variants:
                 continue
             data       = line.strip().split(',')
             gene       = data[0]
@@ -441,9 +439,9 @@ def modify_ref_seq(seq, pos, ref, variant):
 
 
 if __name__ == '__main__':
-    # Read in command line arguments
+    # command line arguments
     if len(sys.argv) != 5 and len(sys.argv) != 6:
-        print('Usage: ./snp_crispr.sh <species> <input_file> <PAM> <all>')
+        print('Usage: ./snp_crispr.sh <species> <input_file> <PAM> <threads> <all/both>')
         exit()
     species = sys.argv[1]
     user_input = sys.argv[2]
@@ -455,7 +453,6 @@ if __name__ == '__main__':
             all_flag = True
 
     # globals
-    header = 'gene_symbol,chromosome,position,strand,reference,variant,group(optional)'
     fasta_index = SeqIO.index('fasta_files/' + species + '.fasta', 'fasta')
     id_map = chr_id_mapping()
     invalid_variants = check_valid_variants()

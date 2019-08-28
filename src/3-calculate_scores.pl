@@ -26,7 +26,7 @@ GetOptions (
 ) or pod2usage(2);
 pod2usage($usage) and exit unless $B1 and $B2;
 
-$OUTPUT = 'results/' . $filename . '.csv';
+$OUTPUT = 'tmp/results/' . $filename . '.csv';
 
 open( REPORT, '<', 'tmp/' . $filename . '-snp_summary.csv' ) or die $!;
 my $header = <REPORT>;

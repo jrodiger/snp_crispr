@@ -26,6 +26,7 @@ Rat - https://www.ncbi.nlm.nih.gov/genome?term=txid10116
 
 ## Usage
 - Add SNP's or INDEL's of interest to input csv file, see `sample_input.csv` for format
+- Input files in VCF format are also supported (file must have .vcf extension)
 - From the project directory run `./snp_crispr.sh <species> <input_file> <PAM> <threads> <-all/-both>`
 - Both `-NGG` and `-NAG` PAM sequences supported
 - Running with the optional `-all` argument designs guides where all SNPs are targeted within the 23-mer
@@ -49,7 +50,7 @@ Rat - https://www.ncbi.nlm.nih.gov/genome?term=txid10116
 
 ## Example Commands
 - Fly: `./snp_crispr.sh dm dm_snps.csv -NGG 2 -all`
-- Human: `./snp_crispr.sh hs hs_snps.csv -NAG 6 -both`
+- Human: `./snp_crispr.sh hs hs_snps.vcf -NAG 6 -both`
 - Mouse: `./snp_crispr.sh mm mm_snps.csv -NGG 3`
 
 ## Design Scores

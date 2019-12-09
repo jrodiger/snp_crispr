@@ -7,16 +7,17 @@ use Pod::Usage;
 use Data::Dumper;
 
 # GLOBALS - organism of interest and BLAST query file (required).
-my ( $SPECIES, $F1, $F2, $OUT, $PAM, $regex );
+my ( $SPECIES, $F1, $F2, $OUT, $PAM, $ALT, $regex );
 my $usage = "Usage:
-  $0 -s input_species -f1 wt_fasta -f2 snp_fasta -o outputfilename -pam pamSeq
+  $0 -s input_species -f1 wt_fasta -f2 snp_fasta -o outputfilename -pam pamSeq -alt useAlt
 
 Quick Help:
   -s    'hs' or 'dm'
   -f1    FASTA file of wild-type designs
   -f2    FASTA file of variant (SNP) designs
   -o     outputfilename
-  -pam   PAM sequence";
+  -pam   PAM sequence
+  -alt   use alt ref";
 
 # Check flags.
 GetOptions (
@@ -25,9 +26,10 @@ GetOptions (
     'f2=s'  => \$F2,
     'o=s'   => \$OUT,
     'pam=s' => \$PAM,
+    'alt=s' => \$ALT,
     help    => sub { pod2usage($usage) }
 ) or pod2usage(2);
-pod2usage($usage) and exit unless $SPECIES and $F1 and $F2 and $OUT and $PAM;
+pod2usage($usage) and exit unless $SPECIES and $F1 and $F2 and $OUT and $PAM and $ALT;
 
 my $sequences = read_fasta( 'fasta_files/' . $SPECIES . '.fasta' );
 
@@ -47,6 +49,10 @@ blast_crispr({
     word_size => 10,
     output    => $filename . '-wt_blast.txt'
 });
+
+if ($ALT eq 'true') {
+    $SPECIES = $SPECIES . '_alt';
+}
 
 blast_crispr({
     db        => 'blast_dbs/' . $SPECIES,

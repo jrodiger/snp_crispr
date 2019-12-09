@@ -5,7 +5,8 @@ species=$1
 input=$2
 pam=$3
 threads=$4
-option=$5
+option1=$5
+option2=$6
 
 # remove previous logs
 rm error.log 2>/dev/null
@@ -21,14 +22,21 @@ fi
 # split input by chromosome
 python src/0-process_input.py $input $threads
 
+# check if using alternate reference for specificity
+if [ "$option1" == "-alt"  ] || [ "$option2" == "-alt"  ]; then
+	alt="-alt"
+else
+	alt=""
+fi
+
 # run pipeline on each tmp chromosome input file
 for file in tmp/input/*; do
 	output="$(basename "$file")"
-	if [ "$option" == "-both" ]; then
-		echo "./src/design.sh $species $file "$output"_1 $pam -all" >> tmp/commands.txt
-		echo "./src/design.sh $species $file "$output"_2 $pam" >> tmp/commands.txt
+	if [ "$option1" == "-both" ]; then
+		echo "./src/design.sh $species $file "$output"_1 $pam -all $alt" >> tmp/commands.txt
+		echo "./src/design.sh $species $file "$output"_2 $pam $alt" >> tmp/commands.txt
 	else
-    	echo "./src/design.sh $species $file $output $pam $option" >> tmp/commands.txt
+    	echo "./src/design.sh $species $file $output $pam $option1 $alt" >> tmp/commands.txt
 	fi
 done
 

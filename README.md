@@ -2,6 +2,8 @@
 SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, Zebrafish, and Rat genomes.  
 Online version available at: [https://www.flyrnai.org/tools/snp_crispr](https://www.flyrnai.org/tools/snp_crispr)
 
+![Workflow](img/workflow.jpg)
+
 ## Prerequisites
 - Anaconda or Miniconda for environment management
 - Species genome in fasta format
@@ -27,11 +29,12 @@ Rat - https://www.ncbi.nlm.nih.gov/genome?term=txid10116
 ## Usage
 - Add SNP's or INDEL's of interest to input csv file, see `sample_input.csv` for format
 - Input files in VCF format are also supported (file must have .vcf extension)
-- From the project directory run `./snp_crispr.sh <species> <input_file> <PAM> <threads> <-all/-both>`
+- From the project directory run `./snp_crispr.sh <species> <input_file> <PAM> <threads> <-all/-both> <-alt>`
 - Both `-NGG` and `-NAG` PAM sequences supported
 - Running with the optional `-all` argument designs guides where all SNPs are targeted within the 23-mer
 - Running with the optional `-both` argument designs guides where all SNPs are targeted within the 23-mer as well as individually
-- **All arguments are required except `-all/-both`**
+- Running with the optional `-alt` argument evaluates the specificity of SNP targeted CRISPRs against a user provided non-reference genome. Before using this option the `makeblastdb` installation step must be repeated using the non-reference genome fasta file and the non-reference blast db title and output filenames must be `<species>_alt`
+- **All arguments are required except `-all/-both and -alt`. Also note that the order of the arguments must match the provided example**
 - Design results found in `results/designs.csv`
 - Input variants without any viable designs are logged in `results/no_designs.csv`
 - No viable designs may be found targeting a variant due to the lack of a neighboring PAM sequence, presence of the U6 terminator (TTTT), or the unavailability of a unique sgRNA sequence
@@ -49,7 +52,7 @@ Rat - https://www.ncbi.nlm.nih.gov/genome?term=txid10116
 (Results will vary depending on the machine, input, species, and options used)
 
 ## Example Commands
-- Fly: `./snp_crispr.sh dm dm_snps.csv -NGG 2 -all`
+- Fly: `./snp_crispr.sh dm dm_snps.csv -NGG 2 -all -alt`
 - Human: `./snp_crispr.sh hs hs_snps.vcf -NAG 6 -both`
 - Mouse: `./snp_crispr.sh mm mm_snps.csv -NGG 3`
 

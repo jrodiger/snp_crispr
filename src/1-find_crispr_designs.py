@@ -35,7 +35,7 @@ def get_chr_locs():
     chr_locs = {}
     with open(user_input, 'r') as f:
         for line in f:
-            if line in invalid_variants:
+            if line.strip() in invalid_variants:
                 continue
             data = line.split(',')
             chromosome = data[1]
@@ -138,7 +138,7 @@ def variant_list(variant_type):
     variants = makehash()
     with open(user_input, 'r') as f:
         for line in f:
-            if line in invalid_variants:
+            if line.strip() in invalid_variants:
                 continue
             data       = line.strip().split(',')
             gene       = data[0]

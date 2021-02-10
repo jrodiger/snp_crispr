@@ -1,6 +1,7 @@
 # SNP CRISPR
-SNP-targeted CRISPR design pipeline for design of sgRNA's in Fly, Human, Mouse, Zebrafish, and Rat genomes.  
-Online version available at: [https://www.flyrnai.org/tools/snp_crispr](https://www.flyrnai.org/tools/snp_crispr)
+SNP-targeted CRISPR sgRNA design pipeline. Online version available at: [https://www.flyrnai.org/tools/snp_crispr](https://www.flyrnai.org/tools/snp_crispr)  
+
+Publication: [https://fgr.hms.harvard.edu/publications/snp-crispr-web-tool-snp-specific-genome-editing](https://fgr.hms.harvard.edu/publications/snp-crispr-web-tool-snp-specific-genome-editing)
 
 ![Workflow](img/workflow.jpg)
 
